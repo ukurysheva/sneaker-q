@@ -1,18 +1,26 @@
 package repository
 
-import "github.com/jmoiron/sqlx"
+import (
+	"github.com/jmoiron/sqlx"
+	sneakerq "github.com/ukurysheva/sneaker-q"
+)
 
-type ParseWork struct {
-	ImportModels
+type Repository struct {
+	Shops
+	Models
 }
 
-type ImportModels interface {
-	GetSources(model)
-	GetModels()
+type Shops interface {
+	GetShops() ([]sneakerq.Shop, error)
 }
 
-func NewParseWork(db *sqlx.DB) *ParseWork {
-	return &ParseWork{
-		ImportModels: NewImportModelsWork(db),
+type Models interface {
+	AddModelsList([]*sneakerq.Model) error
+}
+
+func NewRepository(db *sqlx.DB) *Repository {
+	return &Repository{
+		Shops:  NewShopsPostgres(db),
+		Models: NewModelsPostgres(db),
 	}
 }

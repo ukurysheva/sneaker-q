@@ -16,7 +16,6 @@ func NewShopsPostgres(db *sqlx.DB) *ShopsPostgres {
 }
 
 func (r *ShopsPostgres) GetShops() ([]sneakerq.Shop, error) {
-	// shop := sneakerq.Shop{}
 	var shopsList []sneakerq.Shop
 	query := fmt.Sprintf("SELECT * FROM %s", shopsTable)
 	err := r.db.Select(&shopsList, query)

@@ -28,14 +28,14 @@ func (pt *ParserTask) ParseTask() {
 	fmt.Println(shops)
 
 	// looping through shops classes and adding models
-	for _, shopObj := range shops {
-		shoplist, err := shop.Call(shopObj.ClassName, shopObj.Link, shopObj.Id)
-		// for _, model := range shoplist {
-		fmt.Println(shoplist)
-		pt.repo.Models.AddModelsList(shoplist)
-		// }
+	for _, shopInfo := range shops {
+		menus := shop.ParseMenu(shopInfo)
+
+		// Instead of getting like that - make a goroutine and get models from a channel
+		models := shop.ParseModels(shopInfo, menus)
+		pt.repo.Models.AddModelsList(models)
 		if err != nil {
-			log.Fatalf("err while adding models for %s: %s", shopObj.Title, err.Error())
+			log.Fatalf("err while adding models for %s: %s", shopInfo.Title, err.Error())
 			//  add log
 			continue
 		}

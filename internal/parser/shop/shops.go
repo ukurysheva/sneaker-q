@@ -1,44 +1,42 @@
 package shop
 
 import (
-	"reflect"
-
 	sneakerq "github.com/ukurysheva/sneaker-q"
 )
 
-var ShopsModelsParsers map[string]interface{} = map[string]interface{}{
-	"nike": nikeParseModels,
-}
+func ParseMenu(shopInfo sneakerq.Shop) []*MenuItem {
 
-func Call(funcName string, params ...interface{}) (result []*sneakerq.Model, err error) {
-	f := reflect.ValueOf(ShopsModelsParsers[funcName])
-	// if len(params) != f.Type().NumIn() {
-	// 	// err = errors.New("The number of params is out of index.")
-	// 	return
-	// }
-
-	in := make([]reflect.Value, len(params))
-	for k, param := range params {
-		in[k] = reflect.ValueOf(param)
+	var ParseMenuCall map[string][]*MenuItem = map[string][]*MenuItem{
+		"nike": NikeParseMenu(shopInfo),
 	}
-	var res []reflect.Value
-	res = f.Call(in)
-	result = res[0].Interface().([]*sneakerq.Model)
-	// result := res.Interface().(float64)
-	return
+	return ParseMenuCall[shopInfo.ClassName]
 }
 
-// func loop(slice []interface{}) {
-// 	for _, elem := range slice {
-// 		switch elemTyped := elem.(type) {
-// 		case int:
-// 			fmt.Println("int:", elemTyped)
-// 		case string:
-// 			fmt.Println("string:", elemTyped)
-// 		case []string:
-// 			fmt.Println("[]string:", elemTyped)
-// 		case interface{}:
-// 			fmt.Println("map:", elemTyped)
-// 		}
-// 	}
-// }
+func ParseModels(shopInfo sneakerq.Shop, menus []*MenuItem) []*sneakerq.Model {
+
+	var ParseModelsCall map[string][]*sneakerq.Model = map[string][]*sneakerq.Model{
+		"nike": NikeParseModels(shopInfo, menus),
+	}
+
+	// TODO : call func by reflect
+	// funcName := shopInfo.ClassName + "ParseModels"
+	// f := reflect.ValueOf(funcName)
+	// params:=[]
+	// in := make([]reflect.Value, len(params))
+	// for k, param := range params {
+	// 	in[k] = reflect.ValueOf(param)
+	// }
+	// var res []reflect.Value
+	// res = f.Call(in)
+	// // result = res[0].Interface().(*Parser)
+	// // result = res[0].Interface().([]*sneakerq.Model)
+	// result := res.Interface().(float64)
+	// return
+
+	return ParseModelsCall[shopInfo.ClassName]
+}
+
+type MenuItem struct {
+	Title string
+	Link  string
+}

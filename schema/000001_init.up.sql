@@ -17,4 +17,4 @@ CREATE TABLE models
   size varchar(255)
 );
 INSERT INTO shops (title, link, class_name) VALUES
-('nike.com - женские', 'https://www.nike.com/ru/w/womens-shoes-5e1x6zy7ok', 'nike');
+('nike.com - женские', 'https://www.nike.com/', 'nike');

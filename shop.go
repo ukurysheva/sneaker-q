@@ -10,3 +10,8 @@ type Shop struct {
 type ShopList struct {
 	List []*Shop
 }
+
+type MenuPage struct {
+	Title string
+	Link  string
+}

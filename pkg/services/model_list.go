@@ -1,4 +1,4 @@
-package service
+package services
 
 import (
 	sneakerq "github.com/ukurysheva/sneaker-q"
@@ -17,4 +17,8 @@ func NewModelListService(repo repository.Models) *ModelListService {
 
 func (mlist *ModelListService) GetShopModels(shopname string) ([]sneakerq.Model, error) {
 	return mlist.repo.GetShopModels(shopname)
+}
+
+func (mlist *ModelListService) GetModelsByParams(searchParams sneakerq.SearchParams) ([]sneakerq.Model, error) {
+	return mlist.repo.GetModelsByParams(searchParams)
 }

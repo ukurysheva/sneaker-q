@@ -1,4 +1,4 @@
-package service
+package services
 
 import (
 	sneakerq "github.com/ukurysheva/sneaker-q"
@@ -15,10 +15,11 @@ type ModelItem interface {
 
 type ModelList interface {
 	GetShopModels(shop string) ([]sneakerq.Model, error)
+	GetModelsByParams(searchParams sneakerq.SearchParams) ([]sneakerq.Model, error)
 	// Search(ModelParams sneakerq.Model) []sneakerq.Model // Get list of models, search by params
 }
 
-func NewService(repo repository.Repository) *Service {
+func NewService(repo *repository.Repository) *Service {
 	return &Service{
 		ModelItem: NewModelService(repo.Models),
 		ModelList: NewModelListService(repo.Models),

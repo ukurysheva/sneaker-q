@@ -1,4 +1,4 @@
-package service
+package services
 
 import "github.com/ukurysheva/sneaker-q/pkg/repository"
 

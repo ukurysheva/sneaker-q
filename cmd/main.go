@@ -8,9 +8,10 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"github.com/ukurysheva/sneaker-q/internal/cron"
-	"github.com/ukurysheva/sneaker-q/internal/parser"
+	sneakerq "github.com/ukurysheva/sneaker-q"
+	"github.com/ukurysheva/sneaker-q/pkg/handler"
 	"github.com/ukurysheva/sneaker-q/pkg/repository"
+	"github.com/ukurysheva/sneaker-q/pkg/services"
 )
 
 func main() {
@@ -26,15 +27,6 @@ func main() {
 		fmt.Println(err)
 	}
 
-	// db, _ := repository.NewPostgresDB(repository.Config{
-	// 	Host:     viper.GetString("db.host"),
-	// 	Port:     viper.GetString("db.port"),
-	// 	Username: viper.GetString("db.username"),
-	// 	Password: os.Getenv("DB_PASSWORD"),
-	// 	DBName:   viper.GetString("db.dbname"),
-	// 	SSLMode:  viper.GetString("db.sslmode"),
-	// })
-
 	db, err := repository.NewPostgresDB(repository.Config{
 		Host:     viper.GetString("db.host"),
 		Port:     viper.GetString("db.port"),
@@ -49,15 +41,20 @@ func main() {
 	}
 	repo := repository.NewRepository(db)
 
-	// implimenting parsers
-	parserTask := parser.NewParserTask(repo)
-	// implimenting cronjob
-	_, err = cron.RunCron(parserTask.ParseTask)
-	// cron, err := cron.RunCron(parserTask.ParseTask)
-	// API init
-	if err != nil {
-		return
-		//  log error
+	// parserTask := parser.NewParserTask(repo)
+	// // implimenting cronjob
+	// _, err = cron.RunCron(parserTask.ParseTask)
+	// if err != nil {
+	// 	return
+	// }
+
+	services := services.NewService(repo)
+	handlers := handler.NewHandler(services)
+
+	srv := new(sneakerq.Server)
+
+	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
+		logrus.Fatalf("error occured while running http server: %s", err.Error())
 	}
 
 	return

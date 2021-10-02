@@ -15,7 +15,9 @@ type Shops interface {
 }
 
 type Models interface {
-	AddModelsList([]*sneakerq.Model) error
+	AddUpdateModelsList([]*sneakerq.Model) error
+	GetShopModels(shop string) ([]sneakerq.Model, error)
+	GetModelsByParams(searchParams sneakerq.SearchParams) ([]sneakerq.Model, error)
 }
 
 func NewRepository(db *sqlx.DB) *Repository {

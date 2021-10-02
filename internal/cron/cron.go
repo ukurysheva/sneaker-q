@@ -1,23 +1,21 @@
 package cron
 
 import (
-	"fmt"
-	"time"
-
 	"github.com/jasonlvhit/gocron"
 )
 
 // RunCron is running a cron task every 10 seconds (while on dev mode)
 // in production it is supposed to be running every night
 func RunCron(task func()) (bool, error) {
-	q := make(chan bool)
-	go parsejob(q, task)
+	task()
+	// q := make(chan bool)
+	// go parsejob(q, task)
 
-	// Close channel because we on dev
-	time.Sleep(18 * time.Second)
-	q <- true
-	close(q)
-	fmt.Println("finish")
+	// // Close channel because we on dev
+	// time.Sleep(18 * time.Second)
+	// q <- true
+	// close(q)
+	// fmt.Println("finish")
 
 	return true, nil
 }

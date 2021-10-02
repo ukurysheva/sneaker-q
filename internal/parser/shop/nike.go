@@ -1,6 +1,7 @@
 package shop
 
 import (
+	"fmt"
 	"log"
 	"regexp"
 	"strconv"
@@ -15,7 +16,7 @@ var NikeId int
 
 func NikeParseMenu(shopInfo sneakerq.Shop) []*MenuItem {
 	var menu []*MenuItem
-
+	fmt.Println(shopInfo)
 	// Parse main Menu - get women and men collections
 	geziyor.NewGeziyor(&geziyor.Options{
 		StartURLs: []string{shopInfo.Link},
@@ -34,6 +35,7 @@ func NikeParseMenu(shopInfo sneakerq.Shop) []*MenuItem {
 
 			})
 		},
+		UserAgent: "Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11",
 	}).Start()
 
 	var shoesUrl []*MenuItem

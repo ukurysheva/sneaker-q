@@ -9,13 +9,16 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	sneakerq "github.com/ukurysheva/sneaker-q"
+	"github.com/ukurysheva/sneaker-q/internal/cron"
+	"github.com/ukurysheva/sneaker-q/internal/parser"
 	"github.com/ukurysheva/sneaker-q/pkg/handler"
 	"github.com/ukurysheva/sneaker-q/pkg/repository"
 	"github.com/ukurysheva/sneaker-q/pkg/services"
 )
 
 func main() {
-	// logrus.SetFormatter(new(logrus.JSONFormatter))
+
+	logrus.SetFormatter(new(logrus.JSONFormatter))
 
 	if err := InitConfig(); err != nil {
 		logrus.Fatalf("error initializaing configs: %s", err.Error())
@@ -41,12 +44,12 @@ func main() {
 	}
 	repo := repository.NewRepository(db)
 
-	// parserTask := parser.NewParserTask(repo)
-	// // implimenting cronjob
-	// _, err = cron.RunCron(parserTask.ParseTask)
-	// if err != nil {
-	// 	return
-	// }
+	parserTask := parser.NewParserTask(repo)
+	// implimenting cronjob
+	_, err = cron.RunCron(parserTask.ParseTask)
+	if err != nil {
+		return
+	}
 
 	services := services.NewService(repo)
 	handlers := handler.NewHandler(services)

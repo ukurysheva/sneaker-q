@@ -15,6 +15,7 @@ type Shops interface {
 }
 
 type Models interface {
+	GetModelById(id int) (sneakerq.Model, error)
 	AddUpdateModelsList([]*sneakerq.Model) error
 	GetShopModels(shop string) ([]sneakerq.Model, error)
 	GetModelsByParams(searchParams sneakerq.SearchParams) ([]sneakerq.Model, error)

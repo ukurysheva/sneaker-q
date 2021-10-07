@@ -24,8 +24,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		models := router.Group("/model")
 		{
+			models.GET("/:id", h.searchModels)
 			models.GET("/shop/:shop", h.getShopModels)
 			models.GET("/search", h.searchModels)
+
 			// lists.GET("/:id", h.getListById)
 
 		}

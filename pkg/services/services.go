@@ -6,22 +6,18 @@ import (
 )
 
 type Service struct {
-	ModelItem
-	ModelList
+	Model
 }
 
-type ModelItem interface {
-}
-
-type ModelList interface {
+type Model interface {
 	GetShopModels(shop string) ([]sneakerq.Model, error)
 	GetModelsByParams(searchParams sneakerq.SearchParams) ([]sneakerq.Model, error)
+	GetModelById(id int) (sneakerq.Model, error)
 	// Search(ModelParams sneakerq.Model) []sneakerq.Model // Get list of models, search by params
 }
 
 func NewService(repo *repository.Repository) *Service {
 	return &Service{
-		ModelItem: NewModelService(repo.Models),
-		ModelList: NewModelListService(repo.Models),
+		Model: NewModelService(repo.Models),
 	}
 }

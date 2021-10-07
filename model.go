@@ -12,6 +12,8 @@ type Model struct {
 }
 
 type SearchParams struct {
+	Id        int `db:"id" json:"id"`
+	ShopId    int `db:"shop_id" json:"-"`
 	Sex       []string
 	Size      []string `json:"size"`
 	PriceFrom float64  `json:"price_from"`

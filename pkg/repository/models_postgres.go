@@ -17,23 +17,33 @@ func NewModelsPostgres(db *sqlx.DB) *ModelsPostgres {
 	return &ModelsPostgres{db: db}
 }
 
+func (r *ModelsPostgres) GetModelById(modelId int) (sneakerq.Model, error) {
+	model := sneakerq.Model{}
+	list, err := r.GetModelsByParams(sneakerq.SearchParams{Id: modelId})
+	if err != nil || len(list) < 1 {
+		return model, err
+	}
+
+	model = list[0]
+	return model, nil
+}
+
 // GetShopModels finds models in db by shop name
 func (r *ModelsPostgres) GetShopModels(shopname string) ([]sneakerq.Model, error) {
-	// get models from db
-	var models []sneakerq.Model
-	query := fmt.Sprintf("SELECT m.id, m.shop_id, m.title, m.size, m.price, m.avail, m.page_url FROM  %s AS m  LEFT JOIN %s AS s ON m.shop_id = s.id WHERE s.class_name = $1", modelsTable, shopsTable)
-	err := r.db.Select(&models, query, shopname)
-	if err != nil {
-		return models, err
+	var shopId int
+	query := fmt.Sprintf("SELECT id FROM  %s WHERE s.class_name = $1", shopsTable)
+	err := r.db.Select(&shopId, query, shopname)
+	if shopId < 1 || err != nil {
+		return []sneakerq.Model{}, err
 	}
-	return models, err
+
+	return r.GetModelsByParams(sneakerq.SearchParams{ShopId: shopId})
 }
 
 // GetShopModels finds models in db by shop name
 func (r *ModelsPostgres) GetModelsByParams(searchParams sneakerq.SearchParams) ([]sneakerq.Model, error) {
-	// get models from db
-	var models []sneakerq.Model
-	query := fmt.Sprintf("SELECT m.title, m.size, m.price, m.avail, m.page_url FROM  %s AS m  LEFT JOIN %s AS s ON m.shop_id = s.id WHERE 1=1", modelsTable, shopsTable)
+	models := []sneakerq.Model{}
+	query := fmt.Sprintf("SELECT m.id, m.title, m.size, m.price, m.avail, m.page_url FROM  %s AS m  LEFT JOIN %s AS s ON m.shop_id = s.id WHERE 1=1", modelsTable, shopsTable)
 	index := 1
 	args := make([]interface{}, 0)
 
@@ -59,6 +69,7 @@ func (r *ModelsPostgres) GetModelsByParams(searchParams sneakerq.SearchParams) (
 	fmt.Printf(query)
 	err := r.db.Select(&models, query, args...)
 	if err != nil {
+
 		fmt.Printf(err.Error())
 		return models, err
 	}
@@ -122,72 +133,4 @@ func (r *ModelsPostgres) AddModel(model *sneakerq.Model) error {
 	}
 
 	return tx.Commit()
-}
-
-func getMultiBinds(lenargs int, startFrom int) (string, int) {
-	if lenargs < 1 {
-		return "", startFrom
-	}
-	i := 1
-	bindVars := ""
-	if startFrom > 0 {
-		i = startFrom
-		for i <= lenargs {
-			bindVars += "$" + strconv.Itoa(i) + ","
-			i++
-		}
-	}
-
-	bindVars = strings.TrimSuffix(bindVars, ",")
-	return bindVars, i
-}
-
-// bindVarsToWhere helps to add to where statement necessary count of WHERE statements
-// Example:
-// AND (m.size = $1 AND m.size = $2)
-func getWhereMultiBinds(link string, field string, lenargs int, startFrom int) (string, int) {
-	if link == "" || field == "" || lenargs < 1 {
-		return "", startFrom
-	}
-	fmt.Println("start binding")
-	bindVars := ""
-	i := 1
-	if startFrom > 0 {
-		i = startFrom
-	}
-
-	if lenargs > 1 {
-		bindVars += "("
-
-		for i <= lenargs {
-			bindVars += " " + field + " = " + "$" + strconv.Itoa(i)
-			i++
-			bindVars += " " + link
-		}
-		bindVars = strings.TrimSuffix(bindVars, link)
-		bindVars += ")"
-	} else {
-		bindVars += field + " = " + "$" + strconv.Itoa(i)
-		i++
-	}
-	bindVars = " AND " + bindVars
-	return bindVars, i
-}
-
-func bindVarsToInsert(stmt string, lenargs int, len int) string {
-	fmt.Println("start binding")
-	bindVars := ""
-	i := 1
-	for i <= len {
-		bindVars += "("
-		for j := 0; j < lenargs; j++ {
-			bindVars += "$" + strconv.Itoa(i) + ","
-			i++
-		}
-		bindVars = strings.TrimSuffix(bindVars, ",")
-		bindVars += "),"
-	}
-	stmt += bindVars
-	stmt = fmt.Sprintf(stmt+bindVars, modelsTable)
-	return strings.TrimSuffix(stmt, ",")
 }
